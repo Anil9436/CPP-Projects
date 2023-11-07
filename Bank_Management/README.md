@@ -28,7 +28,7 @@ employee
 
     TODO-LIST
     login
-    show employee details,
+    show customer details,
     manage customer details,
     has to create the account
     employee stores the username and password once he has created 
