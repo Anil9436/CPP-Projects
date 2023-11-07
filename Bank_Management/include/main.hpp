@@ -2,4 +2,16 @@
 #include<string>
 
 
-class 
+class admin{
+    public:
+        friend class staff;
+        friend class customer;
+};
+
+class staff{
+
+};
+
+class customer{
+
+};
