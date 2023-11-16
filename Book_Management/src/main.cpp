@@ -11,11 +11,8 @@ int main()
     Bfirst.CreateDB1();
     Sfirst.CreateDB2();
     Efirst.CreateDB3();
-    Sfirst.add_sup();
-    Sfirst.remove_supplier();
-    Efirst.add_emp();
     Bfirst.add();
-    Sfirst.add_sup();
-
+    Bfirst.display();
+    
     
 }

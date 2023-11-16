@@ -5,7 +5,7 @@ void BookDetails::CreateDB1()
     int rc = sqlite3_open("book_management.db", &db);
     const std::string createBookTable = "CREATE TABLE IF NOT EXISTS Book_Details ("
                  "id INTEGER PRIMARY KEY,"
-                 "name TEXT NOT NULL,"
+                 "name TEXT VARCHAR(255),"
                  "auth TEXT,"
                  "publisher TEXT"
                  ");";
@@ -24,8 +24,8 @@ void BookDetails::add()
     std::cout<<"Enter the book ID: ";
     std::cin>>id;
     std::cout<<"Enter the book name: ";
-    std::getline(std::cin,name);
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    std::cin>>name;
+    // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     std::cout<<"Enter the book author: ";
     std::getline(std::cin,auth);
     std::cout<<"Enter the book publisher: ";
