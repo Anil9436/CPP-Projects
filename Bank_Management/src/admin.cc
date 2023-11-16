@@ -1,10 +1,7 @@
 #include "main.hpp"
 
-
 sqlite3* db;
-sqlite3_stmt* stmt;;
-
-
+sqlite3_stmt* stmt;
 void admin::Welcome(){
     std::cout<<"============"<<" Welcome To Bank "<<"========"<<std::endl;
     std::cout<<"===="<<" Please Create an account to enjoy benefits "<<"======="<<std::endl;
@@ -127,13 +124,97 @@ void admin::login(){
     
 }
 void admin::showPaccoutDetails(){
+    int rc = sqlite3_open("bank_management.db", &db);
+    const char* command  = "SELECT * FROM ADMIN_TABLE;";
+    rc = sqlite3_prepare_v2(db, command, -1, &stmt, 0);
+    
+    if (rc != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+        sqlite3_close(db);
+        return;
+    }
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        // Access and print the data from each column
+        int columnCount = sqlite3_column_count(stmt);
+        for (int i = 0; i < columnCount; i++) {
+            const char* columnName = sqlite3_column_name(stmt, i);
+            const char* columnValue = (const char*)sqlite3_column_text(stmt, i);
+            std::cout << columnName << ": " << columnValue << " ";
+        }
+        std::cout << std::endl;
+    }
 
+    if (rc != SQLITE_DONE) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);    
 
 }
 void admin::showEaccoutDetails( staff& obj){
+    int rc = sqlite3_open("bank_management.db", &db);
+    std::cout<<"Please enter the Existing Employee name: ";
+    std::cin>>obj.eUsername;
+    std::string command  = "SELECT * FROM STAFF_TABLE WHERE eUsername = ? ;";
+    
+    rc = sqlite3_prepare_v2(db, command.c_str(), -1, &stmt, 0);
+    sqlite3_bind_text(stmt, 1, obj.eUsername.c_str(), -1, SQLITE_STATIC);
 
+    if (rc != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+        return;
+    }
+    
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        // Access and print the data from each column
+        int columnCount = sqlite3_column_count(stmt);
+        for (int i = 0; i < columnCount; i++) {
+            const char* columnName = sqlite3_column_name(stmt, i);
+            const char* columnValue = (const char*)sqlite3_column_text(stmt, i);
+            std::cout << columnName << ": " << columnValue << " ";
+        }
+        std::cout << std::endl;
+    }
+    if (rc != SQLITE_DONE) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+    }
+
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);    
 }
 void admin::showCaccoutDetails( customer& obj){
+    int rc = sqlite3_open("bank_management.db", &db);
+    std::cout<<"Please enter the customer name: ";
+    std::cin>>obj.CustomerName;
+    std::string command  = "SELECT * FROM CUSTOMER_TABLE2 WHERE CustomerName = ? ;";
+    
+    rc = sqlite3_prepare_v2(db, command.c_str(), -1, &stmt, 0);
+    sqlite3_bind_text(stmt, 1, obj.CustomerName.c_str(), -1, SQLITE_STATIC);
+
+    if (rc != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+        return;
+    }
+    
+    while ((rc = sqlite3_step(stmt)) == SQLITE_ROW) {
+        // Access and print the data from each column
+        int columnCount = sqlite3_column_count(stmt);
+        for (int i = 0; i < columnCount; i++) {
+            const char* columnName = sqlite3_column_name(stmt, i);
+            const char* columnValue = (const char*)sqlite3_column_text(stmt, i);
+            std::cout << columnName << ": " << columnValue << " ";
+        }
+        std::cout << std::endl;
+    }
+    if (rc != SQLITE_DONE) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+    }
+
+
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);   
 
 }
 void admin::createaccouttoStaff(staff& obj){
@@ -150,9 +231,9 @@ void admin::createaccouttoStaff(staff& obj){
         sqlite3_close(db);
         return;
     }
-    std::cout<<"Please enter the AdminID: ";
+    std::cout<<"Please enter the EmployeeID: ";
     std::cin>>obj.employeeID;
-    std::cout<<"Please Enter the username: ";
+    std::cout<<"Please Enter the Eusername: ";
     std::cin>>obj.eUsername;
     std::cout<<"Please Enter the password: ";
     std::cin>>obj.password;
@@ -164,7 +245,7 @@ void admin::createaccouttoStaff(staff& obj){
     SHA256_Final(hashValue, &sha256);
     std::string hashed_password(reinterpret_cast<char*>(hashValue), SHA256_DIGEST_LENGTH);
     obj.hashedPassword = hashed_password;
-    const std::string query = "INSERT INTO STAFF_TABLE (adminID, adminUsername, hashedPassword) VALUES (?, ?, ?);";
+    const std::string query = "INSERT INTO STAFF_TABLE (employeeID, eUsername, hashedPassword) VALUES (?, ?, ?);";
     rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, 0);
     if (rc != SQLITE_OK) {
         std::cerr << "SQL error: " << sqlite3_errmsg(db) <<"\n";
@@ -251,15 +332,48 @@ void admin::createaccouttocustomer( customer& obj){
     }
     sqlite3_finalize(stmt);
     sqlite3_close(db);
-
-
-
 }
 void admin::removeStaffaccount( staff& obj){
-
+    std::cout<<"Please enter the Employee name you want to remove: ";
+    std::cin>>obj.eUsername;
+    int rc = sqlite3_open("bank_management.db", &db);
+    const char* query = "DELETE FROM STAFF_TABLE WHERE eUsername = ? ;";
+    rc = sqlite3_prepare_v2(db, query , -1, &stmt, 0);
+    if (rc != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) <<"\n";
+        sqlite3_close(db);
+        return;
+    }
+    sqlite3_bind_text(stmt,1,obj.eUsername.c_str(),-1,SQLITE_STATIC);
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_DONE) {
+    std::cout << "Employee Deleted from the table successfully." << std::endl;
+    }else {
+    std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    }
 }
 void admin::removecustomeraccount( customer& obj){
-
+    std::cout<<"Please enter the Customer name you want to remove: ";
+    std::cin>>obj.CustomerName;
+    int rc = sqlite3_open("bank_management.db", &db);
+    const char* query = "DELETE FROM CUSTOMER_TABLE2 WHERE CustomerName = ? ;";
+    rc = sqlite3_prepare_v2(db, query , -1, &stmt, 0);
+    if (rc != SQLITE_OK) {
+        std::cerr << "SQL error: " << sqlite3_errmsg(db) <<"\n";
+        sqlite3_close(db);
+        return;
+    }
+    sqlite3_bind_text(stmt,1,obj.CustomerName.c_str(),-1,SQLITE_STATIC);
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_DONE) {
+    std::cout << "Customer Deleted from the table successfully." << std::endl;
+    }else {
+    std::cerr << "SQL error: " << sqlite3_errmsg(db) << std::endl;
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    }
 }
 void admin::logout(){
 

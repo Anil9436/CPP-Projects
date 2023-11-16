@@ -2,14 +2,19 @@
 
 int main() {
     admin one;
-    // staff sone;
+    staff sone;
+    
     customer cone{0,0};
     one.Welcome();
     // one.createSelfAccount();
     // one.logout();
     // one.login();
     // one.createaccouttoStaff(sone);
-    one.createaccouttocustomer(cone);
+    // one.removeStaffaccount(sone);
+    // one.createaccouttocustomer(cone);
+    // one.removecustomeraccount(cone);
+    // one.showEaccoutDetails(sone);
+    one.showCaccoutDetails(cone);
 
 
 }
