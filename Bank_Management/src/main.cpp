@@ -1,11 +1,12 @@
 #include "main.hpp"
 
+
 int main() {
     admin one;
     staff sone;
     
     customer cone{0,0};
-    one.Welcome();
+    // one.Welcome();
     // one.createSelfAccount();
     // one.logout();
     // one.login();
@@ -14,7 +15,9 @@ int main() {
     // one.createaccouttocustomer(cone);
     // one.removecustomeraccount(cone);
     // one.showEaccoutDetails(sone);
-    one.showCaccoutDetails(cone);
-
-
+    // one.showCaccoutDetails(cone);
+    sone.Welcome();
+    // sone.logout();
+    // sone.login();
+    // sone.support();
 }

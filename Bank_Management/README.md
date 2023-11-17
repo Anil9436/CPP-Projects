@@ -13,8 +13,6 @@
 
 
 > admin operations 
-    
-    TODO-LIST
     login
     show personal account details
     manage employee details

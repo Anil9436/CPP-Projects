@@ -2,9 +2,11 @@
 #include<string>
 #include<openssl/sha.h>
 #include<sqlite3.h>
+#include <cstdlib>
+#include <ctime>
 
-// sqlite3* db;
-// sqlite3_stmt* stmt;
+extern sqlite3* db;
+extern sqlite3_stmt* stmt;
 
 
 #define HASHKEY "SALT091234"
@@ -45,15 +47,11 @@ class staff{
         std::string hashedPassword{};
         void Welcome();
         void login();
-        void print()
-        {
-            std::cout<<eUsername<<std::endl;
-        }
-        void showCaccoutDetails();
+        void showCaccoutDetails(customer& );
         void manageCDetails(); 
         void debitORcredit();
-        void createaccounttocustomer();
-        void removecustomeraccount();
+        void createaccounttocustomer(customer&);
+        void removecustomeraccount(customer&);
         void support();
         void logout();
         

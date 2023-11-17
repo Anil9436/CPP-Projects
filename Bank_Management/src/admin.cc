@@ -188,7 +188,7 @@ void admin::showCaccoutDetails( customer& obj){
     int rc = sqlite3_open("bank_management.db", &db);
     std::cout<<"Please enter the customer name: ";
     std::cin>>obj.CustomerName;
-    std::string command  = "SELECT * FROM CUSTOMER_TABLE2 WHERE CustomerName = ? ;";
+    std::string command  = "SELECT * FROM CUSTOMER_TABLE WHERE CustomerName = ? ;";
     
     rc = sqlite3_prepare_v2(db, command.c_str(), -1, &stmt, 0);
     sqlite3_bind_text(stmt, 1, obj.CustomerName.c_str(), -1, SQLITE_STATIC);
@@ -237,7 +237,7 @@ void admin::createaccouttoStaff(staff& obj){
     std::cin>>obj.eUsername;
     std::cout<<"Please Enter the password: ";
     std::cin>>obj.password;
-    std::string HashedPassword = password + HASHKEY ;
+    std::string HashedPassword = obj.password + HASHKEY ;
     unsigned char hashValue[SHA256_DIGEST_LENGTH];
     SHA256_CTX sha256;
     SHA256_Init(&sha256);
@@ -271,7 +271,7 @@ void admin::createaccouttoStaff(staff& obj){
 }
 void admin::createaccouttocustomer( customer& obj){
     int rc = sqlite3_open("bank_management.db", &db);
-    const char* CreateEmployeeTable = "CREATE TABLE IF NOT EXISTS CUSTOMER_TABLE2 ("
+    const char* CreateEmployeeTable = "CREATE TABLE IF NOT EXISTS CUSTOMER_TABLE ("
                     "customerID INTEGER,"
                     " CustomerName TEXT NOT NULL,"
                     " hashed_password TEXT NOT NULL,"
@@ -307,7 +307,7 @@ void admin::createaccouttocustomer( customer& obj){
     SHA256_Final(hashValue, &sha256);
     std::string hashed_password(reinterpret_cast<char*>(hashValue), SHA256_DIGEST_LENGTH);
     obj.hashedPassword = hashed_password;
-    const std::string query = "INSERT INTO CUSTOMER_TABLE2 (customerID, CustomerName, hashed_password, phonenumber, account_number, balance, address) VALUES (?, ?, ?, ?, ?, ?, ?);";
+    const std::string query = "INSERT INTO CUSTOMER_TABLE (customerID, CustomerName, hashed_password, phonenumber, account_number, balance, address) VALUES (?, ?, ?, ?, ?, ?, ?);";
     rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, 0);
     if (rc != SQLITE_OK) {
         std::cerr << "SQL error: " << sqlite3_errmsg(db) <<"\n";
@@ -358,7 +358,7 @@ void admin::removecustomeraccount( customer& obj){
     std::cout<<"Please enter the Customer name you want to remove: ";
     std::cin>>obj.CustomerName;
     int rc = sqlite3_open("bank_management.db", &db);
-    const char* query = "DELETE FROM CUSTOMER_TABLE2 WHERE CustomerName = ? ;";
+    const char* query = "DELETE FROM CUSTOMER_TABLE WHERE CustomerName = ? ;";
     rc = sqlite3_prepare_v2(db, query , -1, &stmt, 0);
     if (rc != SQLITE_OK) {
         std::cerr << "SQL error: " << sqlite3_errmsg(db) <<"\n";
