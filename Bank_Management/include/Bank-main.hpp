@@ -24,7 +24,7 @@ class admin{
         std::string hashedPassword{};
         void Welcome();
         void createSelfAccount();
-        void login();
+        int login();
         void showPaccoutDetails();
         void logout();
         void showEaccoutDetails( staff& obj);
@@ -46,10 +46,10 @@ class staff{
     public:
         std::string hashedPassword{};
         void Welcome();
-        void login();
+        int login();
         void showCaccoutDetails(customer& );
-        void manageCDetails(); 
-        void debitORcredit();
+        void manageCDetails(customer&);
+        void debitORcredit(customer&);
         void createaccounttocustomer(customer&);
         void removecustomeraccount(customer&);
         void support();
@@ -63,19 +63,19 @@ class customer{
     friend class staff;
     private:
     int customerID;
-    std::string CustomerName{"NULL"};
+    std::string CustomerName{""};
     bool loginStatus;
     protected:
     double phonenumber{0};
-    std::string password{};
+    std::string password{""};
     double account_number{0};
     double balance{0};
-    std::string address{"NULL"};
+    std::string address{""};
     public:
         customer(double ac_no,double bal):account_number{ac_no},balance{bal}{};
         std::string hashedPassword{};
         void Welcome();
-        void login();
+        int login();
         void showaccoutDetails();
         void manageDetails(); //shows balance, shows address, 
         void debitorcredit();
