@@ -13,8 +13,7 @@ int main() {
     // aone.createaccouttoStaff(sone);
     // sone.createaccounttocustomer(cone);
     cone.logout();
-    sone.manageCDetails(cone);
-    // sone.debitORcredit(cone);
+    sone.debitORcredit(cone);
     // aone.createaccouttocustomer(cone);
     
 }   
