@@ -1,26 +1,23 @@
-#include "main.hpp"
-
-
-
+#include "Bank-main.hpp"
 
 void staff::Welcome()
 {
     std::cout<<"============"<<" Welcome To Bank "<<"========"<<std::endl;
     std::cout<<"===="<<" Please Create an account to enjoy benefits "<<"======="<<std::endl;
 }
-void staff::login()
+int staff::login()
 {
      if(loginStatus)
     {
         std::cout<<"Please LogOut and try logging in "<<std::endl;
-        return;
+        return -1;
     }
 
     int rc = sqlite3_open("bank_management.db", &db);  
     if (rc) {
         std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_close(db);
-        return;
+        return -1;
     }
     std::cout<<"Please enter the user name: ";
     std::cin>>eUsername;;
@@ -33,7 +30,7 @@ void staff::login()
     if (rc != SQLITE_OK) {
         std::cerr << sqlite3_errmsg(db) << std::endl;
         sqlite3_close(db);
-        return;
+        return -1;
     }
 
     rc = sqlite3_step(stmt);
@@ -68,6 +65,7 @@ void staff::login()
     // Clean up
     sqlite3_finalize(stmt);
     sqlite3_close(db);
+    return 0;
 }
 void staff::showCaccoutDetails(customer& obj){
     int rc = sqlite3_open("bank_management.db", &db);
@@ -102,22 +100,99 @@ void staff::showCaccoutDetails(customer& obj){
     sqlite3_close(db);   
 
 }
-void staff::manageCDetails(){
-
-} 
-void staff::debitORcredit(){
-    std::cout<<"Please choose your option to credit or debit: "<<
-                "1: FOR CREDIT "<<
-                "2: FOR DEBIT ";
+void staff::manageCDetails(customer& obj){
+     std::cout<<"Please choose 1 for credit and 2 for debit:\n"<<
+                "1: FOR CHANGING PASSWORD \n"<<
+                "2: FOR CHANGING PHONE NUMBER \n"<<
+                "3: FOR CHANGING ADDRESS \n";
     int option;
+    std::cin>>option;
+    switch(option)
+    {
+        case 1:
+            std::cout<<"IN CHANGING PASSWORD "<<std::endl;
+            
+            std::cin>>
+            break;
+        case 2:
+            std::cout<<"IN CHANGING PHONE NUMBER "<<std::endl; 
+            break;
+        case 3:
+            std::cout<<"IN CHANGING ADDRESS "<<std::endl;
+            break;
+        default:
+            break;
+    }
+} 
+void staff::debitORcredit(customer& obj){
+    if(0 != obj.login() )
+    {
+        return;
+    }
+    std::string query;
+    std::cout<<"Please choose 1 for credit and 2 for debit:\n"<<
+                "1: FOR CREDIT \n"<<
+                "2: FOR DEBIT \n";
+    int option;
+    int rc = sqlite3_open("bank_management.db", &db);
     std::cin>>option;
     switch (option)
     {
     case 1:
-        std::cout<<option<<std::endl;
+        std::cout<< "How much you want to credit:  "<<std::endl;
+        double credit;
+        std::cin>>credit;
+        query = "SELECT balance FROM CUSTOMER_TABLE WHERE CustomerName = '" + obj.CustomerName + "'";
+        rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, 0);
+        if (rc != SQLITE_OK) {
+        std::cerr << sqlite3_errmsg(db) << std::endl;
+        sqlite3_close(db);
+        return;
+        }
+        rc = sqlite3_step(stmt);
+        if(rc == SQLITE_ROW)
+        {
+            double n = sqlite3_column_double(stmt, 0);
+            double res = n + credit ; 
+            std::string resStr = std::to_string(res);
+            query = "UPDATE CUSTOMER_TABLE SET balance = '" + resStr + "' WHERE CustomerName = '" + obj.CustomerName + "'";
+            rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, 0);
+            if (rc != SQLITE_OK) {
+            std::cerr << sqlite3_errmsg(db) << std::endl;
+            sqlite3_close(db);
+            return;
+            }
+            rc = sqlite3_step(stmt);
+           std::cout<<"The balance in the account is " << res <<std::endl;
+        }
         break;
     case 2:
-        std::cout<<option<<std::endl;
+         std::cout<< "How much you want to DEBIT:  "<<std::endl;
+        double in;
+        std::cin>>in;
+        query = "SELECT balance FROM CUSTOMER_TABLE WHERE CustomerName = '" + obj.CustomerName + "'";
+        rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, 0);
+        if (rc != SQLITE_OK) {
+        std::cerr << sqlite3_errmsg(db) << std::endl;
+        sqlite3_close(db);
+        return;
+        }
+        rc = sqlite3_step(stmt);
+        if(rc == SQLITE_ROW)
+        {
+            double n = sqlite3_column_double(stmt, 0);
+            double res = n - in ; 
+            std::string resStr = std::to_string(res);
+            query = "UPDATE CUSTOMER_TABLE SET balance = '" + resStr + "' WHERE CustomerName = '" + obj.CustomerName + "'";
+            rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, 0);
+            if (rc != SQLITE_OK) {
+            std::cerr << sqlite3_errmsg(db) << std::endl;
+            sqlite3_close(db);
+            return;
+            }
+            rc = sqlite3_step(stmt);
+           std::cout<<"The balance in the account is " << res <<std::endl;
+        }
         break;
     default:
         break;
@@ -161,7 +236,9 @@ void staff::createaccounttocustomer(customer& obj){
     SHA256_Update(&sha256, HashedPassword.c_str(), HashedPassword.size());
     SHA256_Final(hashValue, &sha256);
     std::string hashed_password(reinterpret_cast<char*>(hashValue), SHA256_DIGEST_LENGTH);
+    
     obj.hashedPassword = hashed_password;
+    std::cout<<obj.hashedPassword<<std::endl;
     const std::string query = "INSERT INTO CUSTOMER_TABLE (customerID, CustomerName, hashed_password, phonenumber, account_number, balance, address) VALUES (?, ?, ?, ?, ?, ?, ?);";
     rc = sqlite3_prepare_v2(db, query.c_str(), -1, &stmt, 0);
     if (rc != SQLITE_OK) {
@@ -171,7 +248,7 @@ void staff::createaccounttocustomer(customer& obj){
     }
     sqlite3_bind_int(stmt,1,obj.customerID);
     sqlite3_bind_text(stmt,2,obj.CustomerName.c_str(),-1,SQLITE_STATIC);
-    sqlite3_bind_text(stmt,3,hashed_password.c_str(),-1,SQLITE_STATIC);
+    sqlite3_bind_text(stmt,3,obj.hashedPassword.c_str(),-1,SQLITE_STATIC);
     sqlite3_bind_double(stmt,4,obj.phonenumber);
     sqlite3_bind_double(stmt,5,obj.account_number);
     sqlite3_bind_double(stmt,6,obj.balance);

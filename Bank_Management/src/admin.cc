@@ -1,4 +1,4 @@
-#include "main.hpp"
+#include "Bank-main.hpp"
 
 sqlite3* db;
 sqlite3_stmt* stmt;
@@ -58,19 +58,19 @@ void admin::createSelfAccount(){
 
 
 }
-void admin::login(){
+int admin::login(){
 
     if(loginStatus)
     {
         std::cout<<"Please LogOut and try logging in "<<std::endl;
-        return;
+        return -1; 
     }
 
     int rc = sqlite3_open("bank_management.db", &db);  
     if (rc) {
         std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_close(db);
-        return;
+        return -1;
     }
     std::cout<<"Please enter the user name: ";
     std::cin>>adminUsername;;
@@ -83,7 +83,7 @@ void admin::login(){
     if (rc != SQLITE_OK) {
         std::cerr << sqlite3_errmsg(db) << std::endl;
         sqlite3_close(db);
-        return;
+        return -1;
     }
 
     rc = sqlite3_step(stmt);
@@ -94,7 +94,6 @@ void admin::login(){
         std::string enteredPassword;
         std::cout << "Enter your password: ";
         std::cin >> enteredPassword;
-
         // Hash the entered password using your hashing method
         std::string enteredSalt = enteredPassword + HASHKEY ;
         unsigned char hashValue[SHA256_DIGEST_LENGTH];
@@ -120,6 +119,7 @@ void admin::login(){
     // Clean up
     sqlite3_finalize(stmt);
     sqlite3_close(db);
+    return 0;
 
     
 }
@@ -299,7 +299,7 @@ void admin::createaccouttocustomer( customer& obj){
     std::cin>>obj.account_number;
     std::cout<<"Please Enter you address: ";
     std::cin>>obj.address;
-    std::string HashedPassword = password + HASHKEY ;
+    std::string HashedPassword = obj.password + HASHKEY ;
     unsigned char hashValue[SHA256_DIGEST_LENGTH];
     SHA256_CTX sha256;
     SHA256_Init(&sha256);
@@ -316,7 +316,7 @@ void admin::createaccouttocustomer( customer& obj){
     }
     sqlite3_bind_int(stmt,1,obj.customerID);
     sqlite3_bind_text(stmt,2,obj.CustomerName.c_str(),-1,SQLITE_STATIC);
-    sqlite3_bind_text(stmt,3,hashed_password.c_str(),-1,SQLITE_STATIC);
+    sqlite3_bind_text(stmt,3,obj.hashedPassword.c_str(),-1,SQLITE_STATIC);
     sqlite3_bind_double(stmt,4,obj.phonenumber);
     sqlite3_bind_double(stmt,5,obj.account_number);
     sqlite3_bind_double(stmt,6,obj.balance);
